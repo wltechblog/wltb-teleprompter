@@ -96,10 +96,6 @@ Thumbs.db
 # Local Android SDK
 android-sdk/
 
-# Gradle wrapper
-gradle/wrapper/gradle-wrapper.jar
-gradle/wrapper/gradle-wrapper.properties
-
 # Generated APK files
 app/build/outputs/apk/
 app/build/outputs/bundle/

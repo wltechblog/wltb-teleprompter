@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Teleprompter</string>
+    <string name="load_file">Load Script</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="reset">Reset</string>
+    <string name="speed">Speed: %d</string>
+    <string name="no_file_loaded">No script loaded</string>
+    <string name="load_txt_file">Select a .txt file</string>
+</resources>

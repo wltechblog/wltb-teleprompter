@@ -5,4 +5,9 @@
     <color name="primary_dark">#FF3700B3</color>
     <color name="accent">#FF03DAC5</color>
     <color name="gray">#FF9E9E9E</color>
+    <color name="recording_red">#FFD32F2F</color>
+    <color name="camera_overlay_bg">#80000000</color>
+    <color name="ic_launcher_background">#FFFFFFFF</color>
+    <color name="settings_preview_bg">#FFF0F0F0</color>
+    <color name="settings_label">#FF757575</color>
 </resources>

@@ -7,4 +7,17 @@
     <string name="speed">Speed: %d</string>
     <string name="no_file_loaded">No script loaded</string>
     <string name="load_txt_file">Select a .txt file</string>
+    <string name="record">⏺ Record</string>
+    <string name="stop_recording">⏹ Stop</string>
+    <string name="switch_camera">⇄ Camera</string>
+    <string name="recording_saved">Recording saved to Movies/Teleprompter</string>
+    <string name="recording_error">Recording error</string>
+    <string name="camera_permission_denied">Camera permission required for recording</string>
+    <string name="settings">Settings</string>
+    <string name="pref_font_size">Font Size</string>
+    <string name="pref_default_speed">Default Scroll Speed</string>
+    <string name="font_size_value">%d sp</string>
+    <string name="font_preview_text">The quick brown fox jumps over the lazy dog.</string>
+    <string name="speed_slow">Slow</string>
+    <string name="speed_fast">Fast</string>
 </resources>

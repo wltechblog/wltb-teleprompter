@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- ── Font Size ───────────────────────────────── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pref_font_size"
+            android:textSize="12sp"
+            android:textColor="@color/settings_label"
+            android:textAllCaps="true"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="12dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A"
+                android:textSize="14sp"
+                android:textColor="@color/settings_label"
+                android:layout_marginEnd="10dp" />
+
+            <SeekBar
+                android:id="@+id/fontSizeSeekBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="48" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A"
+                android:textSize="30sp"
+                android:textColor="@color/settings_label"
+                android:layout_marginStart="10dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/fontSizeValueLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="@color/settings_label"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/fontSizePreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/font_preview_text"
+            android:textColor="@color/black"
+            android:padding="16dp"
+            android:background="@color/settings_preview_bg"
+            android:layout_marginBottom="36dp" />
+
+        <!-- ── Default Scroll Speed ────────────────────── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pref_default_speed"
+            android:textSize="12sp"
+            android:textColor="@color/settings_label"
+            android:textAllCaps="true"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="12dp" />
+
+        <SeekBar
+            android:id="@+id/defaultSpeedSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:layout_marginBottom="6dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/speed_slow"
+                android:textSize="12sp"
+                android:textColor="@color/settings_label" />
+
+            <TextView
+                android:id="@+id/speedValueLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/speed_fast"
+                android:textSize="12sp"
+                android:textColor="@color/settings_label"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+

@@ -106,3 +106,6 @@ app/build/generated/res/
 
 # Generated manifest files
 app/build/intermediates/manifests/
+
+# Source icon used to generate mipmap assets — keep locally but don't commit
+icon.png

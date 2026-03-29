@@ -1,28 +1,44 @@
 # WLTechBlog Teleprompter
 
-A simple Android teleprompter app for reading scripts and presentations. Load your .txt files and control the scrolling with customizable speed.
+An Android teleprompter app for reading scripts and presentations. Load a `.txt` file, set your pace, and record yourself presenting — all from one screen.
 
 ## Features
 
-- Load scripts from .txt files
-- Auto-scroll with configurable speed
-- Manual scroll support
-- Play/Pause/Reset controls
-- Screen rotation support (sensor mode)
-- Clean, readable interface
+### Teleprompter
+- Load scripts from `.txt` files
+- Auto-scroll with a smooth, configurable speed
+- Manual scroll supported at any time, including during playback
+- Play / Pause / Reset controls
+- Portrait and landscape support (sensor rotation)
+
+### Camera & Recording
+- Front camera preview shown as a picture-in-picture overlay while you read
+- Record yourself presenting directly in the app — saved as MP4 to `Movies/Teleprompter/`
+- Switch between front and back cameras with one tap
+- Recording stops cleanly before a camera switch
+
+### Auto-hide UI
+- Controls and the action bar hide automatically when playback starts, giving you a full-screen reading view
+- Tap anywhere to bring controls back for 5 seconds
+- Controls return immediately when you pause or reset
+
+### Settings
+- **Font size** — adjust from 12 sp to 60 sp with a live preview
+- **Default scroll speed** — set the starting speed the slider uses each session
+- Settings are saved and applied automatically on every launch
 
 ## Building the Project
 
 ### Prerequisites
 
-- Java Development Kit (JDK) 8 or higher
+- Java Development Kit (JDK) 17 or higher
 - Android SDK (API level 33)
 - Gradle 8.4 or higher
 
 ### Build Instructions
 
 1. Clone the repository
-2. Set up your local.properties file with the path to your Android SDK:
+2. Set up your `local.properties` file with the path to your Android SDK:
    ```
    sdk.dir=/path/to/your/android-sdk
    ```
@@ -37,21 +53,34 @@ A simple Android teleprompter app for reading scripts and presentations. Load yo
 
 ### Installing on Device
 
-Install the generated APK on your Android device using:
 ```bash
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Or copy the APK file to your device and install it manually.
+Or copy the APK to your device and install it manually.
+
+## Permissions
+
+The app requests the following permissions at runtime:
+
+| Permission | Purpose |
+|---|---|
+| `CAMERA` | Camera preview and recording |
+| `RECORD_AUDIO` | Audio track in recorded videos |
+| `WRITE_EXTERNAL_STORAGE` | Saving recordings on Android 9 and older |
+
+The app functions as a plain teleprompter if camera permissions are denied.
 
 ## Usage
 
-1. Tap "Load Script" to select a .txt file from your device
-2. Use the Play/Pause button to control auto-scrolling
-3. Adjust scroll speed with the slider at the bottom
-4. Use Reset to return to the top of the script
-5. Manually scroll up/down at any time
-6. Rotate your device to view in landscape or portrait mode
+1. Tap **Load Script** to select a `.txt` file
+2. Tap **Play** to start scrolling — the controls will fade out automatically
+3. Adjust scroll speed with the slider before or during playback
+4. Tap the screen during playback to briefly reveal the controls
+5. Tap **⏺ Record** to start recording; tap **⏹ Stop** to finish
+6. Tap **⇄ Camera** to switch between front and back cameras
+7. Open the **⋮ menu → Settings** to change font size or default speed
+8. Tap **Reset** to stop and return to the top
 
 ## License
 

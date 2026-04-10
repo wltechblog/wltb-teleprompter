@@ -31,6 +31,7 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.settings)
 
         loadPreferences()
+        setupDarkModeSwitch()
         setupFontSizeSeekBar()
         setupSpeedSeekBar()
     }
@@ -46,6 +47,9 @@ class SettingsActivity : AppCompatActivity() {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val fontSize = prefs.getInt(KEY_FONT_SIZE, DEFAULT_FONT_SIZE)
         val speed    = prefs.getInt(KEY_DEFAULT_SPEED, DEFAULT_SPEED)
+        val darkMode = prefs.getBoolean(KEY_DARK_MODE, DEFAULT_DARK_MODE)
+
+        binding.darkModeSwitch.isChecked = darkMode
 
         binding.fontSizeSeekBar.progress = fontSize - MIN_FONT_SIZE_SP
         applyFontSize(fontSize)
@@ -54,10 +58,11 @@ class SettingsActivity : AppCompatActivity() {
         updateSpeedLabel(speed)
     }
 
-    private fun save(fontSize: Int, speed: Int) {
+    private fun save(fontSize: Int, speed: Int, darkMode: Boolean) {
         getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
             .putInt(KEY_FONT_SIZE, fontSize)
             .putInt(KEY_DEFAULT_SPEED, speed)
+            .putBoolean(KEY_DARK_MODE, darkMode)
             .apply()
     }
 
@@ -106,7 +111,16 @@ class SettingsActivity : AppCompatActivity() {
     private fun currentSpeed() =
         binding.defaultSpeedSeekBar.progress
 
-    private fun commitAll() = save(currentFontSize(), currentSpeed())
+    private fun currentDarkMode() =
+        binding.darkModeSwitch.isChecked
+
+    private fun commitAll() = save(currentFontSize(), currentSpeed(), currentDarkMode())
+
+    private fun setupDarkModeSwitch() {
+        binding.darkModeSwitch.setOnCheckedChangeListener { _, _ ->
+            commitAll()
+        }
+    }
 
     // ── Constants ─────────────────────────────────────────────────────────────
 
@@ -114,8 +128,10 @@ class SettingsActivity : AppCompatActivity() {
         const val PREFS_NAME        = "teleprompter_prefs"
         const val KEY_FONT_SIZE     = "font_size"
         const val KEY_DEFAULT_SPEED = "default_speed"
+        const val KEY_DARK_MODE     = "dark_mode"
         const val DEFAULT_FONT_SIZE = 24
         const val DEFAULT_SPEED     = 30
+        const val DEFAULT_DARK_MODE = true
         const val MIN_FONT_SIZE_SP  = 12
     }
 }

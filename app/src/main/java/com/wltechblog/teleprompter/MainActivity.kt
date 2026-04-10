@@ -43,6 +43,12 @@ import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
 import androidx.core.content.ContextCompat
 import com.wltechblog.teleprompter.databinding.ActivityMainBinding
+import io.noties.markwon.Markwon
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.ext.tables.TablePlugin
+import io.noties.markwon.ext.tasklist.TaskListPlugin
+import io.noties.markwon.html.HtmlPlugin
+import io.noties.markwon.image.ImagesPlugin
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
@@ -53,6 +59,7 @@ import java.util.concurrent.Executors
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var markwon: Markwon
     private var scrollHandler = Handler(Looper.getMainLooper())
     private var scrollRunnable: Runnable? = null
     private var isPlaying = false
@@ -71,7 +78,7 @@ class MainActivity : AppCompatActivity() {
     private var cameraProvider: ProcessCameraProvider? = null
     private var videoCapture: VideoCapture<Recorder>? = null
     private var activeRecording: Recording? = null
-    private var lensFacing = CameraSelector.LENS_FACING_FRONT
+    private var cameraState = CameraState.FRONT
     private lateinit var cameraExecutor: ExecutorService
     private var originalRecordButtonBackground: Drawable? = null
 
@@ -91,6 +98,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        markwon = Markwon.builder(this)
+            .usePlugin(StrikethroughPlugin.create())
+            .usePlugin(TablePlugin.create(this))
+            .usePlugin(TaskListPlugin.create(this))
+            .usePlugin(HtmlPlugin.create())
+            .usePlugin(ImagesPlugin.create())
+            .build()
 
         gestureDetector = GestureDetector(this,
             object : GestureDetector.SimpleOnGestureListener() {
@@ -131,8 +146,19 @@ class MainActivity : AppCompatActivity() {
         val prefs = getSharedPreferences(SettingsActivity.PREFS_NAME, Context.MODE_PRIVATE)
         val fontSize = prefs.getInt(SettingsActivity.KEY_FONT_SIZE, SettingsActivity.DEFAULT_FONT_SIZE)
         val speed    = prefs.getInt(SettingsActivity.KEY_DEFAULT_SPEED, SettingsActivity.DEFAULT_SPEED)
+        val darkMode = prefs.getBoolean(SettingsActivity.KEY_DARK_MODE, SettingsActivity.DEFAULT_DARK_MODE)
 
         binding.scriptTextView.textSize = fontSize.toFloat()
+        binding.scriptTextView.setTextColor(
+            if (darkMode) ContextCompat.getColor(this, R.color.white)
+            else ContextCompat.getColor(this, R.color.black)
+        )
+        val bgColor = if (darkMode)
+            ContextCompat.getColor(this, R.color.black)
+        else
+            ContextCompat.getColor(this, R.color.white)
+        binding.scrollView.setBackgroundColor(bgColor)
+        binding.rootLayout.setBackgroundColor(bgColor)
 
         scrollSpeed = speed
         binding.scrollSpeedSeekBar.progress = speed
@@ -182,13 +208,25 @@ class MainActivity : AppCompatActivity() {
     private fun bindCameraUseCases() {
         val provider = cameraProvider ?: return
 
+        if (cameraState == CameraState.OFF) {
+            provider.unbindAll()
+            binding.cameraPreview.visibility = View.GONE
+            binding.recordButton.isEnabled = false
+            return
+        }
+
+        val lensFacing = if (cameraState == CameraState.FRONT)
+            CameraSelector.LENS_FACING_FRONT
+        else
+            CameraSelector.LENS_FACING_BACK
+
         val cameraSelector = CameraSelector.Builder()
             .requireLensFacing(lensFacing)
             .build()
 
-        // Verify the requested lens is available; fall back to back if not
+        // Verify the requested lens is available; fall back to the other
         if (!provider.hasCamera(cameraSelector)) {
-            lensFacing = CameraSelector.LENS_FACING_BACK
+            cameraState = if (cameraState == CameraState.FRONT) CameraState.BACK else CameraState.FRONT
             bindCameraUseCases()
             return
         }
@@ -207,26 +245,18 @@ class MainActivity : AppCompatActivity() {
             provider.bindToLifecycle(this, cameraSelector, preview, videoCapture)
             binding.cameraPreview.visibility = View.VISIBLE
             binding.recordButton.isEnabled = true
-            updateSwitchCameraButton(provider)
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Failed to start camera: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun updateSwitchCameraButton(provider: ProcessCameraProvider) {
-        val hasFront = provider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)
-        val hasBack = provider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)
-        binding.switchCameraButton.isEnabled = hasFront && hasBack
-    }
-
     private fun switchCamera() {
-        lensFacing = if (lensFacing == CameraSelector.LENS_FACING_FRONT) {
-            CameraSelector.LENS_FACING_BACK
-        } else {
-            CameraSelector.LENS_FACING_FRONT
+        cameraState = when (cameraState) {
+            CameraState.FRONT -> CameraState.BACK
+            CameraState.BACK -> CameraState.OFF
+            CameraState.OFF -> CameraState.FRONT
         }
-        // Stop any in-progress recording before switching
         if (activeRecording != null) {
             activeRecording?.stop()
             activeRecording = null
@@ -288,7 +318,6 @@ class MainActivity : AppCompatActivity() {
         activeRecording = null
         binding.recordButton.text = getString(R.string.record)
         binding.recordButton.background = originalRecordButtonBackground
-        cameraProvider?.let { updateSwitchCameraButton(it) }
 
         if (!event.hasError()) {
             Toast.makeText(this, getString(R.string.recording_saved), Toast.LENGTH_SHORT).show()
@@ -371,8 +400,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun openFilePicker() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-            type = "text/plain"
+            type = "*/*"
             addCategory(Intent.CATEGORY_OPENABLE)
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("text/plain", "text/markdown", "text/x-markdown"))
         }
         startActivityForResult(
             Intent.createChooser(intent, getString(R.string.load_txt_file)),
@@ -391,7 +421,8 @@ class MainActivity : AppCompatActivity() {
         try {
             contentResolver.openInputStream(uri)?.use { inputStream ->
                 val reader = BufferedReader(InputStreamReader(inputStream))
-                binding.scriptTextView.text = reader.readText()
+                val rawText = reader.readText()
+                markwon.setMarkdown(binding.scriptTextView, rawText)
                 binding.playPauseButton.isEnabled = true
                 binding.resetButton.isEnabled = true
                 resetScroll()
@@ -462,6 +493,8 @@ class MainActivity : AppCompatActivity() {
         private const val CONTROLS_AUTO_HIDE_MS = 5_000L
         private const val CONTROLS_FADE_MS      = 250L
     }
+
+    private enum class CameraState { FRONT, BACK, OFF }
 
     // ── Lifecycle ────────────────────────────────────────────────────────────
 
